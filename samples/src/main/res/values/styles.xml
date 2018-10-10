@@ -189,26 +189,26 @@
     <style name="Popups.Down" />
 
     <style name="Popups.Down.Left">
-        <item name="@android:windowEnterAnimation">@anim/show_tl_to_br</item>
-        <item name="@android:windowExitAnimation">@anim/hide_br_to_tl</item>
+        <item name="android:windowEnterAnimation">@anim/show_tl_to_br</item>
+        <item name="android:windowExitAnimation">@anim/hide_br_to_tl</item>
     </style>
 
     <style name="Popups.Down.Right">
-        <item name="@android:windowEnterAnimation">@anim/show_tr_to_bl</item>
-        <item name="@android:windowExitAnimation">@anim/hide_bl_to_tr</item>
+        <item name="android:windowEnterAnimation">@anim/show_tr_to_bl</item>
+        <item name="android:windowExitAnimation">@anim/hide_bl_to_tr</item>
     </style>
 
     <!-- Up -->
     <style name="Popups.Up" />
 
     <style name="Popups.Up.Left">
-        <item name="@android:windowEnterAnimation">@anim/show_bl_to_tr</item>
-        <item name="@android:windowExitAnimation">@anim/hide_tr_to_bl</item>
+        <item name="android:windowEnterAnimation">@anim/show_bl_to_tr</item>
+        <item name="android:windowExitAnimation">@anim/hide_tr_to_bl</item>
     </style>
 
     <style name="Popups.Up.Right">
-        <item name="@android:windowEnterAnimation">@anim/show_br_to_tl</item>
-        <item name="@android:windowExitAnimation">@anim/hide_tl_to_br</item>
+        <item name="android:windowEnterAnimation">@anim/show_br_to_tl</item>
+        <item name="android:windowExitAnimation">@anim/hide_tl_to_br</item>
     </style>
 
 </resources>
