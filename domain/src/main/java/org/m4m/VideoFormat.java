@@ -98,6 +98,15 @@ public abstract class VideoFormat extends MediaFormat {
     }
 
     /**
+     * Sets video bit rate.
+     *
+     * @param bitRate Video bit rate in bits per second.
+     */
+    public void setVideoBitRate(int bitRate) {
+        setInteger(KEY_BIT_RATE, bitRate);
+    }
+
+    /**
      * Returns video frame rate in frames/sec.
      *
      * @return Video frame rate in frames/sec.
