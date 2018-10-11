@@ -38,10 +38,10 @@ public class VideoTimeScaler extends MediaCodecPlugin {
     private TextureRenderer.FillMode fillMode = TextureRenderer.FillMode.PreserveAspectFit;
     private IPreviewTranscode previewTranscode;
 
-    private int timeScale;
+    private float timeScale;
     private FileSegment segment = new FileSegment(0l, 0l);
 
-    public VideoTimeScaler(IMediaCodec mediaCodec, IAndroidMediaObjectFactory factory, int timeScale, FileSegment segment) {
+    public VideoTimeScaler(IMediaCodec mediaCodec, IAndroidMediaObjectFactory factory, float timeScale, FileSegment segment) {
         super(mediaCodec);
         this.factory = factory;
         this.timeScale = timeScale;

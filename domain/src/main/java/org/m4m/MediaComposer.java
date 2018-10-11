@@ -61,7 +61,7 @@ public class MediaComposer implements Serializable {
     private VideoFormat videoFormat;
     private Resampler resampler;
 
-    private int timeScale = 1;
+    private float timeScale = 1f;
     private FileSegment segment = new FileSegment(0l, 0l); // Whole stream by default
 
     /**
@@ -319,7 +319,7 @@ public class MediaComposer implements Serializable {
         startCommandsProcessingAsync();
     }
 
-    public void setVideoTimeScale(int timeScale, FileSegment segment) {
+    public void setVideoTimeScale(float timeScale, FileSegment segment) {
         this.timeScale = timeScale;
         this.segment = segment;
         videoTimeScaler = factory.createVideoTimeScaler(timeScale, segment);

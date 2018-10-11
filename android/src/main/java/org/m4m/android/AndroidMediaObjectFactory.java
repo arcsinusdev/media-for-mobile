@@ -160,7 +160,7 @@ public class AndroidMediaObjectFactory implements IAndroidMediaObjectFactory {
     }
 
     @Override
-    public VideoTimeScaler createVideoTimeScaler(int timeScale, FileSegment segment) {
+    public VideoTimeScaler createVideoTimeScaler(float timeScale, FileSegment segment) {
         return new VideoTimeScaler(new MediaCodecEncoderPlugin("video/avc", getEglUtil()), this, timeScale, segment);
     }
 

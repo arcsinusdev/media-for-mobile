@@ -54,7 +54,7 @@ public interface IAndroidMediaObjectFactory {
 
     VideoEffector createVideoEffector();
 
-    VideoTimeScaler createVideoTimeScaler(int timeScale, FileSegment segment);
+    VideoTimeScaler createVideoTimeScaler(float timeScale, FileSegment segment);
 
     IEffectorSurface createEffectorSurface();
 

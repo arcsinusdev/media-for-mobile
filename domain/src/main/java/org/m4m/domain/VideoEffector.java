@@ -44,7 +44,7 @@ public class VideoEffector extends MediaCodecPlugin {
     private int outputAngle = 0;
     private TextureRenderer.FillMode fillMode = TextureRenderer.FillMode.PreserveAspectFit;
 
-    private int timeScale = 1;
+    private float timeScale = 1f;
     private FileSegment segment = new FileSegment(0l, 0l);
 
     public VideoEffector(IMediaCodec mediaCodec, IAndroidMediaObjectFactory factory) {
@@ -509,7 +509,7 @@ public class VideoEffector extends MediaCodecPlugin {
         return fillMode;
     }
 
-    public void setTimeScale(int timeScale) {
+    public void setTimeScale(float timeScale) {
         this.timeScale = timeScale;
     }
 
