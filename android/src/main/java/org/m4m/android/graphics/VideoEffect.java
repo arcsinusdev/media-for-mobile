@@ -16,6 +16,8 @@
 
 package org.m4m.android.graphics;
 
+import android.util.Pair;
+
 import org.m4m.IVideoEffect;
 import org.m4m.domain.FileSegment;
 import org.m4m.domain.Resolution;
@@ -28,6 +30,8 @@ import org.m4m.domain.pipeline.TriangleVerticesCalculator;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VideoEffect implements IVideoEffect {
     protected static final int FLOAT_SIZE_BYTES = 4;
@@ -47,11 +51,20 @@ public class VideoEffect implements IVideoEffect {
     private TextureRenderer.FillMode fillMode = TextureRenderer.FillMode.PreserveAspectFit;
     private String vertexShader =  IEglUtil.VERTEX_SHADER;
     private String fragmentShader =  IEglUtil.FRAGMENT_SHADER_OES;
+    protected TextureType textureType;
+
+    protected final List<Pair<Long, Long>> timeIntervals = new ArrayList<>();
 
     public VideoEffect(int angle, IEglUtil eglUtil) {
+        this(angle, eglUtil, TextureType.GL_TEXTURE_EXTERNAL_OES);
+    }
+
+    public VideoEffect(int angle, IEglUtil eglUtil, TextureType textureType) {
         this.angle = angle;
         this.eglUtil = eglUtil;
+        this.textureType = textureType;
     }
+
     public void setVertexShader(String verexShader) {
         this.vertexShader = verexShader;
     }
@@ -113,7 +126,7 @@ public class VideoEffect implements IVideoEffect {
                 mvpMatrix,
                 transformMatrix,
                 angle,
-                TextureType.GL_TEXTURE_EXTERNAL_OES,
+                textureType,
                 inputTextureId,
                 inputResolution,
                 fillMode
@@ -154,5 +167,20 @@ public class VideoEffect implements IVideoEffect {
 
     protected void checkGlError() {
         eglUtil.checkEglError("VideoEffect");
+    }
+
+    public boolean isActive(long timeProgress) {
+        // Assuming if no intervals added the effect is active
+        if (timeIntervals.isEmpty()) return true;
+
+        for (Pair<Long, Long> interval : timeIntervals) {
+            if (timeProgress >= interval.first && timeProgress <= interval.second) return true;
+        }
+
+        return false;
+    }
+
+    public void addTimeInterval(long start, long end) {
+        timeIntervals.add(new Pair<>(start, end));
     }
 }
