@@ -21,40 +21,64 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+
 import org.m4m.android.graphics.VideoEffect;
 import org.m4m.domain.graphics.IEglUtil;
+import org.m4m.domain.graphics.TextureType;
 
 public abstract class OverlayEffect extends VideoEffect {
+    private final static int DEFAULT_BITMAP_WIDTH = 1280;
+    private final static int DEFAULT_BITMAP_HEIGHT = 720;
+
+    private final String FRAGMENT_SHADER =
+            "precision mediump float;\n" +
+                    "varying vec2 vTextureCoord;\n" +
+                    "uniform sampler2D oTexture;\n" +
+                    "void main() {\n" +
+                    "  gl_FragColor = texture2D(oTexture, vTextureCoord);\n" +
+                    "}\n";
+
+    private final String FRAGMENT_SHADER_OEM =
+            "#extension GL_OES_EGL_image_external : require\n" +
+                    "precision mediump float;\n" +
+                    "varying vec2 vTextureCoord;\n" +
+                    "uniform samplerExternalOES sTexture;\n" +
+                    "uniform sampler2D oTexture;\n" +
+                    "void main() {\n" +
+                    "  vec4 bg_color = texture2D(sTexture, vTextureCoord);\n" +
+                    "  vec4 fg_color = texture2D(oTexture, vTextureCoord);\n" +
+                    "  float colorR = (1.0 - fg_color.a) * bg_color.r + fg_color.a * fg_color.r;\n" +
+                    "  float colorG = (1.0 - fg_color.a) * bg_color.g + fg_color.a * fg_color.g;\n" +
+                    "  float colorB = (1.0 - fg_color.a) * bg_color.b + fg_color.a * fg_color.b;\n" +
+                    "  gl_FragColor = vec4(colorR, colorG, colorB, bg_color.a);\n" +
+                    "}\n";
 
     private int oTextureHandle;
     private int[] textures = new int[1];
 
-    Bitmap bitmap = null;
-    int inputBitmapWidth = 1280; // default resolution
-    int inputBitmapHeight = 720;
+    private Bitmap bitmap = null;
 
-
-    public OverlayEffect(int angle, IEglUtil eglUtil) {
-        super(angle, eglUtil);
-        bitmap = Bitmap.createBitmap(inputBitmapWidth, inputBitmapHeight, Bitmap.Config.ARGB_8888);
-        setFragmentShader(getFragmentShader());
+    public OverlayEffect(int angle, IEglUtil eglUtil)
+    {
+        this(angle,
+                eglUtil,
+                TextureType.GL_TEXTURE_EXTERNAL_OES,
+                DEFAULT_BITMAP_WIDTH,
+                DEFAULT_BITMAP_HEIGHT);
     }
 
-    protected String getFragmentShader() {
-        return "#extension GL_OES_EGL_image_external : require\n" +
-                "precision mediump float;\n" +
-                "varying vec2 vTextureCoord;\n" +
-                "uniform samplerExternalOES sTexture;\n" +
-                "uniform sampler2D oTexture;\n" +
-                "void main() {\n" +
-                "  vec4 bg_color = texture2D(sTexture, vTextureCoord);\n" +
-                "  vec4 fg_color = texture2D(oTexture, vTextureCoord);\n" +
-                "  float colorR = (1.0 - fg_color.a) * bg_color.r + fg_color.a * fg_color.r;\n" +
-                "  float colorG = (1.0 - fg_color.a) * bg_color.g + fg_color.a * fg_color.g;\n" +
-                "  float colorB = (1.0 - fg_color.a) * bg_color.b + fg_color.a * fg_color.b;\n" +
-                "  gl_FragColor = vec4(colorR, colorG, colorB, bg_color.a);\n" +
-                "}\n";
+    public OverlayEffect(int angle,
+                         IEglUtil eglUtil,
+                         TextureType textureType,
+                         int width,
+                         int height)
+    {
+        super(angle, eglUtil, textureType);
+        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
+        String shader = textureType == TextureType.GL_TEXTURE_2D
+                ? FRAGMENT_SHADER : FRAGMENT_SHADER_OEM;
+        setFragmentShader(shader);
     }
 
     @Override
