@@ -123,7 +123,9 @@ public class CommandProcessor implements ICommandProcessor {
 
     private synchronized void checkIfPaused() {
         while (isPaused) try {
-            progressListener.onMediaPause();
+            if (progressListener != null) {
+                progressListener.onMediaPause();
+            }
             wait();
         } catch (InterruptedException e) {
             e.printStackTrace();

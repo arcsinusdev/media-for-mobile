@@ -105,7 +105,10 @@ public class MuxRender extends Render {
         muxer.writeSampleData(frame.getTrackId(), frame.getByteBuffer(), bufferInfo);
 
         progressTracker.track(frame.getSampleTime());
-        progressListener.onMediaProgress(progressTracker.getProgress());
+
+        if (progressListener != null) {
+            progressListener.onMediaProgress(progressTracker.getProgress());
+        }
     }
 
     @Override
@@ -116,7 +119,10 @@ public class MuxRender extends Render {
 
             closeRender();
 
-            progressListener.onMediaStop();
+            if (progressListener != null) {
+                progressListener.onMediaStop();
+            }
+
             if (onStopListener != null) {
                 onStopListener.onStop();
             }

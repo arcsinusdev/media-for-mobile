@@ -79,6 +79,22 @@ public class MediaComposer implements Serializable {
     }
 
     /**
+     * Instantiates an object with Android base-layer.
+     *
+     * @param factory          IAndroidMediaObjectFactory class object.
+     * @see IAndroidMediaObjectFactory
+     * @see org.m4m.IProgressListener
+     */
+    public MediaComposer(IAndroidMediaObjectFactory factory) {
+        this.factory = factory;
+        multipleMediaSource = new MultipleMediaSource();
+    }
+
+    public void setProgressListener(IProgressListener progressListener) {
+        this.progressListener = progressListener;
+    }
+
+    /**
      * Adds a file to a collection of input files. Call for every input file.
      *
      * @param fileName Input file name. String class, FileDescriptor class, or Uri class object.
@@ -354,23 +370,33 @@ public class MediaComposer implements Serializable {
     }
 
     private void notifyOnMediaStart() {
-        progressListener.onMediaStart();
+        if (progressListener != null) {
+            progressListener.onMediaStart();
+        }
     }
 
     private void notifyOnMediaDone() {
-        progressListener.onMediaDone();
+        if (progressListener != null) {
+            progressListener.onMediaDone();
+        }
     }
 
     private void notifyOnMediaStop() {
-        progressListener.onMediaStop();
+        if (progressListener != null) {
+            progressListener.onMediaStop();
+        }
     }
 
     private void notifyOnMediaProgress(float progress) {
-        progressListener.onMediaProgress(progress);
+        if (progressListener != null) {
+            progressListener.onMediaProgress(progress);
+        }
     }
 
     private void notifyOnError(Exception exception) {
-        progressListener.onError(exception);
+        if (progressListener != null) {
+            progressListener.onError(exception);
+        }
     }
 
     private void startCommandsProcessingAsync() {
