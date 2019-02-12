@@ -119,6 +119,10 @@ public class MediaComposer implements Serializable {
         multipleMediaSource.add(mediaFile);
     }
 
+    public void addSourceFile(MediaFile mediaFile) throws RuntimeException {
+        multipleMediaSource.add(mediaFile);
+    }
+
     /**
      * Removes a single file from the collection of input files.
      *
