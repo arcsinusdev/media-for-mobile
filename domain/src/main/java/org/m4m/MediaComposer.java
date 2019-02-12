@@ -58,7 +58,8 @@ public class MediaComposer implements Serializable {
     private IProgressListener progressListener;
     private ProgressTracker progressTracker = new ProgressTracker();
     private AudioFormat audioFormat;
-    private VideoFormat videoFormat;
+    private VideoFormat sourceVideoFormat;
+    private VideoFormat targetVideoFormat;
     private Resampler resampler;
 
     private float timeScale = 1f;
@@ -184,13 +185,23 @@ public class MediaComposer implements Serializable {
     }
 
     /**
+     * Sets VideoFormat for the source file.
+     *
+     * @param mediaFormat Source file VideoFormat.
+     * @see VideoFormat
+     */
+    public void setSourceVideoFormat(VideoFormat mediaFormat) {
+        sourceVideoFormat = mediaFormat;
+    }
+
+    /**
      * Sets VideoFormat for the target file.
      *
      * @param mediaFormat Target file VideoFormat.
      * @see VideoFormat
      */
     public void setTargetVideoFormat(VideoFormat mediaFormat) {
-        videoFormat = mediaFormat;
+        targetVideoFormat = mediaFormat;
     }
 
     /**
@@ -199,7 +210,7 @@ public class MediaComposer implements Serializable {
      * @return Target file VideoFormat.
      */
     public VideoFormat getTargetVideoFormat() {
-        return videoFormat;
+        return targetVideoFormat;
     }
 
     /**
@@ -298,11 +309,15 @@ public class MediaComposer implements Serializable {
         pipeline = new Pipeline(commandProcessor);
         pipeline.setMediaSource(multipleMediaSource);
 
+        if (sourceVideoFormat == null) {
+            sourceVideoFormat = targetVideoFormat;
+        }
+
         // Note: if the 1st (current) stream doesn't have video, there will be audio pipeline only.
-        if (videoFormat != null && multipleMediaSource.hasTrack(MediaFormatType.VIDEO)) {
-            videoDecoder = factory.createVideoDecoder(videoFormat);
+        if (targetVideoFormat != null && multipleMediaSource.hasTrack(MediaFormatType.VIDEO)) {
+            videoDecoder = factory.createVideoDecoder(sourceVideoFormat);
             videoEncoder = factory.createVideoEncoder();
-            videoEncoder.setMediaFormat(videoFormat);
+            videoEncoder.setMediaFormat(targetVideoFormat);
         }
         if (videoDecoder != null) pipeline.addVideoDecoder(videoDecoder);
         if (videoEncoder != null) pipeline.addVideoEncoder(videoEncoder);
