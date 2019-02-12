@@ -388,6 +388,18 @@ public class MediaComposer implements Serializable {
         this.resampler = factory.createAudioResampler(audioFormat);
     }
 
+    public void reset() {
+        multipleMediaSource = new MultipleMediaSource();
+        progressListener = null;
+        sink = null;
+        videoEffector = null;
+        videoTimeScaler = null;
+        audioEffector = null;
+        audioFormat = null;
+        sourceVideoFormat = null;
+        targetVideoFormat = null;
+    }
+
     private void notifyOnMediaStart() {
         if (progressListener != null) {
             progressListener.onMediaStart();
@@ -429,26 +441,32 @@ public class MediaComposer implements Serializable {
                     progressTracker.setFinish(multipleMediaSource.getSegmentsDurationInMicroSec());
                     commandProcessor.process();
                 } catch (Exception e) {
-                    try {
-                        pipeline.release();
-                        notifyOnError(e);
-                    } catch (IOException e1) {
-                        notifyOnError(e);
-                        notifyOnError(e1);
-                    }
+                    notifyOnError(e);
+                    release();
                     return;
                 }
 
-                try {
-                    pipeline.release();
-                } catch (IOException e) {
-                    notifyOnError(e);
-                    return;
-                }
+                release();
 
                 notifyOnMediaProgress(1);
                 notifyOnMediaDone();
             }
         }).start();
+    }
+
+    private void release() {
+        try {
+            pipeline.release();
+        } catch (IOException e) {
+            notifyOnError(e);
+        } finally {
+            pipeline = null;
+        }
+
+        commandProcessor = null;
+        videoDecoder = null;
+        videoEncoder = null;
+        audioDecoder = null;
+        audioEncoder = null;
     }
 }
