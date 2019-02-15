@@ -16,6 +16,7 @@
 
 package org.m4m;
 
+import org.m4m.domain.Pair;
 import org.m4m.domain.Resolution;
 
 /**
@@ -60,4 +61,15 @@ public interface IVideoEffect extends IBaseVideoEffect {
      *
      */
     int getAngle();
+
+    void addTimeInterval(Pair<Long, Long> interval);
+
+    void addTimeInterval(long start, long end);
+
+    /*
+    * Whether the effect will affect in the specified time position
+    *
+    * @param timeProgress Time position in microseconds
+    * */
+    boolean isActive(long timeProgress);
 }

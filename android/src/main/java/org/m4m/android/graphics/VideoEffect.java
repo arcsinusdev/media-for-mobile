@@ -16,10 +16,9 @@
 
 package org.m4m.android.graphics;
 
-import android.util.Pair;
-
 import org.m4m.IVideoEffect;
 import org.m4m.domain.FileSegment;
+import org.m4m.domain.Pair;
 import org.m4m.domain.Resolution;
 import org.m4m.domain.graphics.IEglUtil;
 import org.m4m.domain.graphics.Program;
@@ -169,17 +168,25 @@ public class VideoEffect implements IVideoEffect {
         eglUtil.checkEglError("VideoEffect");
     }
 
-    public boolean isActive(long timeProgress) {
-        // Assuming if no intervals added the effect is active
-        if (timeIntervals.isEmpty()) return true;
-
+    protected Pair<Long, Long> getCurrentInterval(long timeProgress) {
         for (Pair<Long, Long> interval : timeIntervals) {
-            if (timeProgress >= interval.first && timeProgress <= interval.second) return true;
+            if (timeProgress >= interval.left && timeProgress <= interval.right) return interval;
         }
-
-        return false;
+        return null;
     }
 
+    @Override
+    public boolean isActive(long timeProgress) {
+        // Assuming if no intervals added the effect is active
+        return timeIntervals.isEmpty() || getCurrentInterval(timeProgress) != null;
+    }
+
+    @Override
+    public void addTimeInterval(Pair<Long, Long> interval) {
+        timeIntervals.add(interval);
+    }
+
+    @Override
     public void addTimeInterval(long start, long end) {
         timeIntervals.add(new Pair<>(start, end));
     }

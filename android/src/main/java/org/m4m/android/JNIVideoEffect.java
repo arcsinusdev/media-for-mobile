@@ -17,6 +17,7 @@ package org.m4m.android;
 
 import org.m4m.IVideoEffect;
 import org.m4m.domain.FileSegment;
+import org.m4m.domain.Pair;
 import org.m4m.domain.Resolution;
 import org.m4m.domain.graphics.TextureRenderer;
 
@@ -71,6 +72,17 @@ public class JNIVideoEffect implements IVideoEffect {
     public int getAngle() {
         return 0;
     }
+
+    @Override
+    public void addTimeInterval(Pair<Long, Long> interval) {
+    }
+
+    @Override
+    public void addTimeInterval(long start, long end) {
+    }
+
+    @Override
+    public boolean isActive(long timeProgress) { return false; }
 
     private native FileSegment getSegmentJNI(long thisListener);
     private native void startJNI(long tag);
