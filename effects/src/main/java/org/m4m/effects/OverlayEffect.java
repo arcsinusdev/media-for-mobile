@@ -23,6 +23,7 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
 import org.m4m.android.graphics.VideoEffect;
+import org.m4m.domain.Resolution;
 import org.m4m.domain.graphics.IEglUtil;
 import org.m4m.domain.graphics.TextureType;
 
@@ -33,9 +34,15 @@ public abstract class OverlayEffect extends VideoEffect {
     private final String FRAGMENT_SHADER =
             "precision mediump float;\n" +
                     "varying vec2 vTextureCoord;\n" +
+                    "uniform sampler2D texture;\n" +
                     "uniform sampler2D oTexture;\n" +
                     "void main() {\n" +
-                    "  gl_FragColor = texture2D(oTexture, vTextureCoord);\n" +
+                    "  vec4 bg_color = texture2D(texture, vTextureCoord);\n" +
+                    "  vec4 fg_color = texture2D(oTexture, vTextureCoord);\n" +
+                    "  float colorR = (1.0 - fg_color.a) * bg_color.r + fg_color.a * fg_color.r;\n" +
+                    "  float colorG = (1.0 - fg_color.a) * bg_color.g + fg_color.a * fg_color.g;\n" +
+                    "  float colorB = (1.0 - fg_color.a) * bg_color.b + fg_color.a * fg_color.b;\n" +
+                    "  gl_FragColor = vec4(colorR, colorG, colorB, bg_color.a);\n" +
                     "}\n";
 
     private final String FRAGMENT_SHADER_OEM =
@@ -53,6 +60,7 @@ public abstract class OverlayEffect extends VideoEffect {
                     "  gl_FragColor = vec4(colorR, colorG, colorB, bg_color.a);\n" +
                     "}\n";
 
+    private int textureHandle;
     private int oTextureHandle;
     private int[] textures = new int[1];
 
@@ -84,6 +92,7 @@ public abstract class OverlayEffect extends VideoEffect {
     @Override
     public void start() {
         super.start();
+        textureHandle = shaderProgram.getAttributeLocation("texture");
         oTextureHandle = shaderProgram.getAttributeLocation("oTexture");
 
         GLES20.glGenTextures(1, textures, 0);
@@ -113,6 +122,8 @@ public abstract class OverlayEffect extends VideoEffect {
 
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
         checkGlError("texImage2d");
+        GLES20.glUniform1i(textureHandle, 0);
+        checkGlError("oTextureHandle - glUniform1i");
         GLES20.glUniform1i(oTextureHandle, 1);
         checkGlError("oTextureHandle - glUniform1i");
     }
