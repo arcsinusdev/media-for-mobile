@@ -28,12 +28,15 @@ public class ShaderProgram implements IShaderProgram {
     private HashMap<String, Integer> attributes = new HashMap<String, Integer>();
     private IEglUtil eglUtil;
 
+    private int vertexShader = INVALID_VALUE;
+    private int fragmentShader = INVALID_VALUE;
+
     public ShaderProgram(IEglUtil eglUtil) {
         this.eglUtil = eglUtil;
     }
 
     public void create(String vertexCode, String fragmentCode) {
-        int vertexShader = INVALID_VALUE;
+
         if (vertexCode != null) {
             vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexCode);
         }
@@ -42,7 +45,6 @@ public class ShaderProgram implements IShaderProgram {
             return;
         }
 
-        int fragmentShader = INVALID_VALUE;
         if (fragmentCode != null) {
             fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentCode);
         }
@@ -111,5 +113,13 @@ public class ShaderProgram implements IShaderProgram {
 
     public int getProgramHandle() {
         return programHandle;
+    }
+
+    public void release() {
+        GLES20.glDetachShader(programHandle, vertexShader);
+        GLES20.glDetachShader(programHandle, fragmentShader);
+        GLES20.glDeleteShader(vertexShader);
+        GLES20.glDeleteShader(fragmentShader);
+        GLES20.glDeleteProgram(programHandle);
     }
 }

@@ -84,6 +84,10 @@ public class JNIVideoEffect implements IVideoEffect {
     @Override
     public boolean isActive(long timeProgress) { return false; }
 
+    @Override
+    public void release() {
+    }
+
     private native FileSegment getSegmentJNI(long thisListener);
     private native void startJNI(long tag);
     private native void applyEffectJNI(long thisListener, int inTextureId, long timeProgress, float[] transformMatrix);

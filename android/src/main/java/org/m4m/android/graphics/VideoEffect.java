@@ -190,4 +190,10 @@ public class VideoEffect implements IVideoEffect {
     public void addTimeInterval(long start, long end) {
         timeIntervals.add(new Pair<>(start, end));
     }
+
+    @Override
+    public void release() {
+        if (shaderProgram != null)
+            shaderProgram.release();
+    }
 }

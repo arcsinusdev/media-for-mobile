@@ -72,4 +72,6 @@ public interface IVideoEffect extends IBaseVideoEffect {
     * @param timeProgress Time position in microseconds
     * */
     boolean isActive(long timeProgress);
+
+    void release();
 }
