@@ -18,6 +18,7 @@ package org.m4m.android.graphics;
 
 import org.m4m.IVideoEffect;
 import org.m4m.domain.FileSegment;
+import org.m4m.domain.IEffectorSurface;
 import org.m4m.domain.Pair;
 import org.m4m.domain.Resolution;
 import org.m4m.domain.graphics.IEglUtil;
@@ -51,6 +52,7 @@ public class VideoEffect implements IVideoEffect {
     private String vertexShader =  IEglUtil.VERTEX_SHADER;
     private String fragmentShader =  IEglUtil.FRAGMENT_SHADER_OES;
     protected TextureType textureType;
+    protected boolean isOverlayActive = false;
 
     protected final List<Pair<Long, Long>> timeIntervals = new ArrayList<>();
 
@@ -189,6 +191,16 @@ public class VideoEffect implements IVideoEffect {
     @Override
     public void addTimeInterval(long start, long end) {
         timeIntervals.add(new Pair<>(start, end));
+    }
+
+
+    @Override
+    public void setOverlaySurface(IEffectorSurface surface) {
+    }
+
+    @Override
+    public void setOverlayActive(boolean isOverlayActive) {
+        this.isOverlayActive = isOverlayActive;
     }
 
     @Override

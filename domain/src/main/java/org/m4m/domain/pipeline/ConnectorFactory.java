@@ -20,6 +20,7 @@ import org.m4m.AudioFormat;
 import org.m4m.domain.AudioDecoder;
 import org.m4m.domain.AudioEffector;
 import org.m4m.domain.AudioEncoder;
+import org.m4m.domain.CompositeVideoDecoder;
 import org.m4m.domain.Encoder;
 import org.m4m.domain.ICameraSource;
 import org.m4m.domain.ICaptureSource;
@@ -86,6 +87,11 @@ public class ConnectorFactory {
 
         if (source instanceof VideoDecoder && transform instanceof VideoEffector) {
             new PluginConnector(commandProcessor).connect((VideoDecoder) source, (VideoEffector) transform);
+            return;
+        }
+
+        if (source instanceof CompositeVideoDecoder && transform instanceof VideoEffector) {
+            new PluginConnector(commandProcessor).connect((CompositeVideoDecoder) source, (VideoEffector) transform);
             return;
         }
 

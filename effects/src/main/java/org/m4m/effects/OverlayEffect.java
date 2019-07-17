@@ -49,10 +49,10 @@ public abstract class OverlayEffect extends VideoEffect {
             "#extension GL_OES_EGL_image_external : require\n" +
                     "precision mediump float;\n" +
                     "varying vec2 vTextureCoord;\n" +
-                    "uniform samplerExternalOES sTexture;\n" +
+                    "uniform samplerExternalOES texture;\n" +
                     "uniform sampler2D oTexture;\n" +
                     "void main() {\n" +
-                    "  vec4 bg_color = texture2D(sTexture, vTextureCoord);\n" +
+                    "  vec4 bg_color = texture2D(texture, vTextureCoord);\n" +
                     "  vec4 fg_color = texture2D(oTexture, vTextureCoord);\n" +
                     "  float colorR = (1.0 - fg_color.a) * bg_color.r + fg_color.a * fg_color.r;\n" +
                     "  float colorG = (1.0 - fg_color.a) * bg_color.g + fg_color.a * fg_color.g;\n" +

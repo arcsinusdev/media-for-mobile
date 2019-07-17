@@ -22,6 +22,7 @@ import org.m4m.domain.AudioEffector;
 import org.m4m.domain.AudioEncoder;
 import org.m4m.domain.Command;
 import org.m4m.domain.CommandHandlerFactory;
+import org.m4m.domain.CompositeVideoDecoder;
 import org.m4m.domain.Encoder;
 import org.m4m.domain.ICameraSource;
 import org.m4m.domain.ICaptureSource;
@@ -119,6 +120,22 @@ class PluginConnector implements IConnector {
 
         decoder.configure();
         decoder.start();
+    }
+
+    public void connect(CompositeVideoDecoder compositeVideoDecoder, VideoEffector effector) {
+        configureCommandProcessorPushMultiSurfaceEffector(compositeVideoDecoder, effector);
+
+        VideoDecoder primaryDecoder = compositeVideoDecoder.getPrimaryDecoder();
+        primaryDecoder.setOutputSurface(effector.getSurface());
+        primaryDecoder.configure();
+        primaryDecoder.start();
+
+        VideoDecoder overlayDecoder = compositeVideoDecoder.getOverlayDecoder();
+        if (overlayDecoder != null) {
+            overlayDecoder.setOutputSurface(effector.getOverlappingSurface());
+            overlayDecoder.configure();
+            overlayDecoder.start();
+        }
     }
 
     public void connect(AudioEffector effector, AudioEncoder audioEncoder, AudioFormat mediaFormat) {
@@ -285,6 +302,36 @@ class PluginConnector implements IConnector {
                 return new ConfigureVideoEffectorCommandHandler(videoOutput, encoder);
             }
 
+        });
+        commandProcessor.add(new OutputInputPair(decoder, encoder, factory));
+    }
+
+    private void configureCommandProcessorPushMultiSurfaceEffector(final CompositeVideoDecoder decoder, final VideoEffector encoder) {
+        CommandHandlerFactory factory = new CommandHandlerFactory();
+        factory.register(new Pair<Command, Integer>(Command.HasData, 0), new Pair<Command, Integer>(Command.NeedData, 0), new IHandlerCreator() {
+            @Override
+            public ICommandHandler create() {
+                return new PushSurfaceCommandHandlerForCompositeDecoderEffector(decoder, encoder);
+            }
+        });
+        factory.register(new Pair<Command, Integer>(Command.EndOfFile, 0), new Pair<Command, Integer>(Command.NeedData, 0), new IHandlerCreator() {
+            @Override
+            public ICommandHandler create() {
+                return new DrainCommandHandler(encoder);
+            }
+        });
+        factory.register(new Pair<Command, Integer>(Command.OutputFormatChanged, 0), new Pair<Command, Integer>(Command.NeedData, 0), new IHandlerCreator() {
+            @Override
+            public ICommandHandler create() {
+                return new SkipOutputFormatChangeCommandHandler(encoder);
+            }
+
+        });
+        factory.register(new Pair<Command, Integer>(Command.OutputFormatChanged, 0), new Pair<Command, Integer>(Command.NeedInputFormat, 0), new IHandlerCreator() {
+            @Override
+            public ICommandHandler create() {
+                return new ConfigureVideoEffectorCommandHandler(decoder.getPrimaryDecoder(), encoder);
+            }
         });
         commandProcessor.add(new OutputInputPair(decoder, encoder, factory));
     }

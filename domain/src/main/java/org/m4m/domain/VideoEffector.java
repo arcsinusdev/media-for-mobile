@@ -341,6 +341,7 @@ public class VideoEffector extends MediaCodecPlugin {
         internalOverlappingSurface = factory.createEffectorSurface();
 
         for (IVideoEffect effect : videoEffects) {
+            effect.setOverlaySurface(internalOverlappingSurface);
             effect.start();
         }
     }

@@ -17,6 +17,7 @@ package org.m4m.android;
 
 import org.m4m.IVideoEffect;
 import org.m4m.domain.FileSegment;
+import org.m4m.domain.IEffectorSurface;
 import org.m4m.domain.Pair;
 import org.m4m.domain.Resolution;
 import org.m4m.domain.graphics.TextureRenderer;
@@ -83,6 +84,14 @@ public class JNIVideoEffect implements IVideoEffect {
 
     @Override
     public boolean isActive(long timeProgress) { return false; }
+
+    @Override
+    public void setOverlaySurface(IEffectorSurface surface) {
+    }
+
+    @Override
+    public void setOverlayActive(boolean isOverlayActive) {
+    }
 
     @Override
     public void release() {

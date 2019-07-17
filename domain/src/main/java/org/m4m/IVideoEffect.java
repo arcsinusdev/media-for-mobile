@@ -16,6 +16,7 @@
 
 package org.m4m;
 
+import org.m4m.domain.IEffectorSurface;
 import org.m4m.domain.Pair;
 import org.m4m.domain.Resolution;
 
@@ -72,6 +73,10 @@ public interface IVideoEffect extends IBaseVideoEffect {
     * @param timeProgress Time position in microseconds
     * */
     boolean isActive(long timeProgress);
+
+    void setOverlaySurface(IEffectorSurface surface);
+
+    void setOverlayActive(boolean isOverlayActive);
 
     void release();
 }

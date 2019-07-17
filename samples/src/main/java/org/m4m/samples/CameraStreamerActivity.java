@@ -42,7 +42,9 @@ import org.m4m.android.AudioFormatAndroid;
 import org.m4m.android.VideoFormatAndroid;
 import org.m4m.android.graphics.VideoEffect;
 import org.m4m.domain.FileSegment;
+import org.m4m.domain.IEffectorSurface;
 import org.m4m.domain.IPreview;
+import org.m4m.domain.Pair;
 import org.m4m.domain.Resolution;
 import org.m4m.domain.graphics.TextureRenderer;
 import org.m4m.effects.GrayScaleEffect;
@@ -198,6 +200,26 @@ public class CameraStreamerActivity extends ActivityWithTimeline implements Stre
         public ArrayList<IVideoEffect> getVideoEffects() {
             return videoEffects;
         }
+
+        @Override
+        public void addTimeInterval(Pair<Long, Long> interval) { }
+
+        @Override
+        public void addTimeInterval(long start, long end) { }
+
+        @Override
+        public boolean isActive(long timeProgress) {
+            return false;
+        }
+
+        @Override
+        public void setOverlaySurface(IEffectorSurface surface) { }
+
+        @Override
+        public void setOverlayActive(boolean isOverlayActive) { }
+
+        @Override
+        public void release() { }
     }
 
     Camera camera = null;
