@@ -16,6 +16,8 @@
 
 package org.m4m.android.graphics;
 
+import android.opengl.Matrix;
+
 import org.m4m.IVideoEffect;
 import org.m4m.domain.FileSegment;
 import org.m4m.domain.IEffectorSurface;
@@ -121,6 +123,10 @@ public class VideoEffect implements IVideoEffect {
         triangleVertices.clear();
         triangleVertices.put(TriangleVerticesCalculator.getDefaultTriangleVerticesData()).position(0);
 
+        Resolution outputResolution = eglUtil.calculateOutputResolution(inputResolution, fillMode);
+
+        prepareMvpMatrix(outputResolution);
+
         eglUtil.drawFrameStart(
                 eglProgram,
                 triangleVertices,
@@ -129,11 +135,16 @@ public class VideoEffect implements IVideoEffect {
                 angle,
                 textureType,
                 inputTextureId,
-                inputResolution,
-                fillMode
+                outputResolution
         );
         addEffectSpecific();
         eglUtil.drawFrameFinish();
+    }
+
+    protected void prepareMvpMatrix(Resolution outputResolution) {
+        Matrix.setIdentityM(mvpMatrix, 0);
+        eglUtil.prepareMvpMatrix(
+                angle, inputResolution, outputResolution, fillMode, mvpMatrix);
     }
 
     @Override

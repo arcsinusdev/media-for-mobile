@@ -46,6 +46,16 @@ public interface IEglUtil {
 
     int createTexture(int textureType);
 
+    Resolution calculateOutputResolution(Resolution inputResolution, TextureRenderer.FillMode fillMode);
+
+    void prepareMvpMatrix(
+            float angle,
+            Resolution inputResolution,
+            Resolution outputResolution,
+            TextureRenderer.FillMode fillMode,
+            float[] mvpMatrix
+    );
+
     void drawFrameStart(
             Program program,
             FloatBuffer triangleVertices,
@@ -54,8 +64,7 @@ public interface IEglUtil {
             float angle,
             TextureType textureType,
             int textureId,
-            Resolution inputResolution,
-            TextureRenderer.FillMode fillMode
+            Resolution outputResolution
     );
 
     void drawFrameFinish();

@@ -206,6 +206,17 @@ public class CameraSource extends org.m4m.domain.CameraSource {
          */
         public void drawImage() {
             surfaceTexture.getTransformMatrix(matrix);
+            Resolution scaledResolution = eglUtil.calculateOutputResolution(
+                    outputResolution, TextureRenderer.FillMode.PreserveAspectFit);
+
+            Matrix.setIdentityM(textureRender.mvpMatrix, 0);
+            eglUtil.prepareMvpMatrix(
+                    0,
+                    outputResolution,
+                    scaledResolution,
+                    TextureRenderer.FillMode.PreserveAspectFit,
+                    textureRender.mvpMatrix);
+
             eglUtil.drawFrameStart(
                     textureRender.program,
                     textureRender.triangleVertices,
@@ -214,8 +225,7 @@ public class CameraSource extends org.m4m.domain.CameraSource {
                     0,
                     TextureType.GL_TEXTURE_EXTERNAL_OES,
                     textureRender.getTextureId(),
-                    outputResolution,
-                    TextureRenderer.FillMode.PreserveAspectFit);
+                    scaledResolution);
         }
 
         @Override

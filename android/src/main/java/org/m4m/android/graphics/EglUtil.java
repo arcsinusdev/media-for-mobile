@@ -100,6 +100,66 @@ public class EglUtil implements IEglUtil {
     }
 
     @Override
+    public Resolution calculateOutputResolution(
+            Resolution inputResolution,
+            TextureRenderer.FillMode fillMode
+    ) {
+        Resolution outputResolution;
+        switch (fillMode) {
+            case PreserveSize:
+                outputResolution = inputResolution;
+                break;
+            case PreserveAspectFit:
+            case PreserveAspectCrop:
+                outputResolution = getCurrentSurfaceResolution();
+                break;
+            default:
+                outputResolution = new Resolution(0, 0);
+                break;
+        }
+
+        return outputResolution;
+    }
+
+    @Override
+    public void prepareMvpMatrix(
+            float angle,
+            Resolution inputResolution,
+            Resolution outputResolution,
+            TextureRenderer.FillMode fillMode,
+            float[] mvpMatrix
+    ) {
+        float[] scale;
+        switch (fillMode) {
+            case PreserveAspectFit:
+                scale = scaleCalculator.getScale_PreserveAspectFit(
+                        (int) angle,
+                        inputResolution.width(), inputResolution.height(),
+                        outputResolution.width(), outputResolution.height());
+                Matrix.scaleM(mvpMatrix, 0, scale[0], scale[1], 1);
+                Matrix.rotateM(mvpMatrix, 0, -angle, 0.f, 0.f, 1.f);
+                break;
+
+            case PreserveAspectCrop:
+                scale = scaleCalculator.getScale_PreserveAspectCrop(
+                        (int) angle,
+                        inputResolution.width(), inputResolution.height(),
+                        outputResolution.width(), outputResolution.height());
+                Matrix.scaleM(mvpMatrix, 0, scale[0], scale[1], 1);
+                Matrix.rotateM(mvpMatrix, 0, -angle, 0.f, 0.f, 1.f);
+                break;
+
+            case PreserveSize:
+                if (angle == 90 || angle == 270) {
+                    Matrix.rotateM(mvpMatrix, 0, 180, 0.f, 0.f, 1.f);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
     public void drawFrameStart(
             Program program,
             FloatBuffer triangleVertices,
@@ -108,26 +168,11 @@ public class EglUtil implements IEglUtil {
             float angle,
             TextureType textureType,
             int textureId,
-            Resolution inputResolution,
-            TextureRenderer.FillMode fillMode
+            Resolution outputResolution
     ) {
         checkEglError("onDrawFrame start");
 
-        Resolution out;
-        switch (fillMode) {
-            case PreserveSize:
-                out = inputResolution;
-                break;
-            case PreserveAspectFit:
-            case PreserveAspectCrop:
-                out = getCurrentSurfaceResolution();
-                break;
-            default:
-                out = new Resolution(0, 0);
-                break;
-        }
-
-        GLES20.glViewport(0, 0, out.width(), out.height());
+        GLES20.glViewport(0, 0, outputResolution.width(), outputResolution.height());
 
         GLES20.glUseProgram(program.programHandle);
         checkEglError("glUseProgram");
@@ -157,29 +202,6 @@ public class EglUtil implements IEglUtil {
         GLES20.glEnableVertexAttribArray(program.textureHandle);
         checkEglError("glEnableVertexAttribArray maTextureHandle");
 
-        Matrix.setIdentityM(mvpMatrix, 0);
-
-        float scale[];
-        switch (fillMode) {
-            case PreserveAspectFit:
-                scale = scaleCalculator.getScale_PreserveAspectFit((int) angle, inputResolution.width(), inputResolution.height(), out.width(), out.height());
-                Matrix.scaleM(mvpMatrix, 0, scale[0], scale[1], 1);
-                Matrix.rotateM(mvpMatrix, 0, -angle, 0.f, 0.f, 1.f);
-                break;
-            case PreserveAspectCrop:
-                scale = scaleCalculator.getScale_PreserveAspectCrop((int) angle, inputResolution.width(), inputResolution.height(), out.width(), out.height());
-                Matrix.scaleM(mvpMatrix, 0, scale[0], scale[1], 1);
-                Matrix.rotateM(mvpMatrix, 0, -angle, 0.f, 0.f, 1.f);
-                break;
-            case PreserveSize:
-                if (angle == 90 || angle == 270) {
-                    Matrix.rotateM(mvpMatrix, 0, 180, 0.f, 0.f, 1.f);
-                }
-                break;
-            default:
-                break;
-        }
-
         GLES20.glUniformMatrix4fv(program.mvpMatrixHandle, 1, false, mvpMatrix, 0);
         GLES20.glUniformMatrix4fv(program.stMatrixHandle, 1, false, stMatrix, 0);
     }
@@ -203,10 +225,25 @@ public class EglUtil implements IEglUtil {
             Resolution resolution,
             TextureRenderer.FillMode fillMode
     ) {
-        drawFrameStart(program, triangleVertices, mvpMatrix, stMatrix, angle, textureType, textureId, resolution, fillMode);
+        Resolution outputResolution = calculateOutputResolution(resolution, fillMode);
+
+        Matrix.setIdentityM(mvpMatrix, 0);
+        prepareMvpMatrix(
+                0,
+                resolution,
+                outputResolution,
+                TextureRenderer.FillMode.PreserveAspectFit,
+                mvpMatrix);
+
+        drawFrameStart(program,
+                triangleVertices,
+                mvpMatrix,
+                stMatrix,
+                angle, textureType,
+                textureId,
+                outputResolution);
         drawFrameFinish();
     }
-
     private ShaderProgram createShaderProgram(String vertexSource, String fragmentSource) {
         ShaderProgram shaderProgram = new ShaderProgram(this);
         shaderProgram.create(vertexSource, fragmentSource);
