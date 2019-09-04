@@ -35,10 +35,7 @@ public class VideoFormatAndroid extends VideoFormat {
         setVideoCodec(mimeType);
     }
 
-    public android.media.MediaFormat getNativeFormat() {
-        if(mediaFormat.containsKey("rotation-degrees")){
-            mediaFormat.setInteger("rotation-degrees", 0);
-        }
+    android.media.MediaFormat getNativeFormat() {
         return mediaFormat;
     }
 
